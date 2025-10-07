@@ -4,6 +4,16 @@
 frontend/node_modules/
 frontend/dist/
 frontend/build/
+frontend/.vite/
+
+# Frontend cache
+frontend/.cache/
+frontend/.parcel-cache/
+frontend/.next/
+frontend/out/
+
+# TypeScript
+frontend/*.tsbuildinfo
 
 # Env files (frontend)
 frontend/.env
@@ -19,6 +29,23 @@ backend/node_modules/
 backend/vendor/
 backend/dist/
 backend/build/
+
+# Go specific
+backend/*.exe
+backend/*.exe~
+backend/*.dll
+backend/*.so
+backend/*.dylib
+backend/server
+backend/server.exe
+backend/tmp/
+backend/bin/
+backend/__debug_bin
+
+# Go test coverage
+backend/*.out
+backend/coverage.txt
+backend/coverage.html
 
 # Env files (backend)
 backend/.env
@@ -55,3 +82,38 @@ coverage/
 # OS files
 .DS_Store
 Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Lock files (optional - uncomment if you want to ignore)
+# frontend/pnpm-lock.yaml
+# frontend/package-lock.json
+# frontend/yarn.lock
+# backend/go.sum
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*~.nib
+local_*.sh
+local_*.bat
+
+# Database files (if using SQLite locally)
+*.db
+*.sqlite
+*.sqlite3
+
+# Certificates & keys
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+
+# Misc
+.env.backup
+.tool-versions
+.vercel
+.netlify
