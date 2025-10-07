@@ -68,7 +68,8 @@ export const CSVUpload: FC<CSVUploadProps> = ({ onUpload }) => {
   return (
     <div className="space-y-6">
       {/* File Upload */}
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-500 transition-colors">
+            {/* File Upload */}
+      <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 sm:p-8 text-center hover:border-primary-400 hover:bg-primary-50/30 transition-all">
         <input
           type="file"
           accept=".csv"
@@ -78,10 +79,10 @@ export const CSVUpload: FC<CSVUploadProps> = ({ onUpload }) => {
           disabled={isLoading}
         />
         <label htmlFor="csv-upload" className="cursor-pointer">
-          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
           </svg>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-xs sm:text-sm text-gray-600">
             {file ? file.name : 'Click to upload CSV file'}
           </p>
           <p className="mt-1 text-xs text-gray-500">
@@ -104,7 +105,7 @@ export const CSVUpload: FC<CSVUploadProps> = ({ onUpload }) => {
             <h3 className="text-lg font-medium text-gray-900">Preview (First 5 rows)</h3>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Voucher Code</th>
@@ -112,7 +113,7 @@ export const CSVUpload: FC<CSVUploadProps> = ({ onUpload }) => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Expiry Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-slate-100">
                 {preview.map((row, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 text-sm text-gray-900">{row.voucher_code}</td>
@@ -128,7 +129,7 @@ export const CSVUpload: FC<CSVUploadProps> = ({ onUpload }) => {
 
       {/* Actions */}
       {file && (
-        <div className="flex justify-end gap-3">
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
           <Button
             variant="secondary"
             onClick={() => {
@@ -137,6 +138,7 @@ export const CSVUpload: FC<CSVUploadProps> = ({ onUpload }) => {
               setError('');
             }}
             disabled={isLoading}
+            className="w-full sm:w-auto"
           >
             Cancel
           </Button>
@@ -145,6 +147,7 @@ export const CSVUpload: FC<CSVUploadProps> = ({ onUpload }) => {
             onClick={handleUpload}
             isLoading={isLoading}
             disabled={isLoading || preview.length === 0}
+            className="w-full sm:w-auto"
           >
             Upload {preview.length > 5 ? `All Rows` : `${preview.length} Row${preview.length > 1 ? 's' : ''}`}
           </Button>
