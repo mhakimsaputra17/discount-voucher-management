@@ -1,5 +1,6 @@
 import { createContext, FC, ReactNode, useState, useEffect } from 'react';
-import type { AuthContextType, LoginCredentials } from '../types/auth';
+import { apiClient } from '../api/axios';
+import type { AuthContextType, LoginCredentials, LoginResponse } from '../types/auth';
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -16,10 +17,11 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   }, []);
 
   const login = async (credentials: LoginCredentials) => {
-    // Dummy authentication - just save a token
-    const dummyToken = '123456';
-    localStorage.setItem('token', dummyToken);
-    setToken(dummyToken);
+    const response = await apiClient.post<LoginResponse>('/login', credentials);
+    const newToken = response.token;
+
+    localStorage.setItem('token', newToken);
+    setToken(newToken);
     setIsAuthenticated(true);
   };
 

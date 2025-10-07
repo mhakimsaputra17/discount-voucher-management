@@ -15,13 +15,24 @@ export interface VoucherFormData {
 
 export interface VouchersResponse {
   data: Voucher[];
-  total: number;
+  pagination: PaginationMeta;
+}
+
+export interface PaginationMeta {
   page: number;
   limit: number;
+  total: number;
+  total_pages: number;
+}
+
+export interface CSVUploadFailure {
+  row: number;
+  reason: string;
 }
 
 export interface CSVUploadResult {
-  success: number;
-  failed: number;
-  errors: string[];
+  total_rows: number;
+  success_count: number;
+  failure_count: number;
+  failures: CSVUploadFailure[];
 }

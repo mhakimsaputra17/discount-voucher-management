@@ -1,5 +1,5 @@
 import { FC, ReactNode } from 'react';
-import { Header } from './Header';
+import { Sidebar } from './Sidebar';
 
 interface LayoutProps {
   children: ReactNode;
@@ -7,9 +7,11 @@ interface LayoutProps {
 
 export const Layout: FC<LayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <main className="container-custom py-8">{children}</main>
+    <div className="flex min-h-screen bg-gray-50">
+      <Sidebar />
+      <main className="flex-1 overflow-auto w-full">
+        <div className="container-custom py-4 sm:py-6 md:py-8 lg:py-10">{children}</div>
+      </main>
     </div>
   );
 };

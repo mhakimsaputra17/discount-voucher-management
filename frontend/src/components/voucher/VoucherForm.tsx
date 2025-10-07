@@ -82,12 +82,13 @@ export const VoucherForm: FC<VoucherFormProps> = ({
         disabled={isLoading}
       />
 
-      <div className="flex gap-3 justify-end pt-4">
+      <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 justify-end pt-4">
         <Button
           type="button"
           variant="secondary"
           onClick={onCancel}
           disabled={isLoading}
+          className="w-full sm:w-auto"
         >
           Cancel
         </Button>
@@ -96,6 +97,7 @@ export const VoucherForm: FC<VoucherFormProps> = ({
           variant="primary"
           isLoading={isLoading}
           disabled={isLoading}
+          className="w-full sm:w-auto"
         >
           {initialData ? 'Update' : 'Create'} Voucher
         </Button>

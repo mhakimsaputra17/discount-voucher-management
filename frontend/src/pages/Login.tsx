@@ -4,6 +4,8 @@ import { useAuth } from '../hooks/useAuth';
 import { Input } from '../components/common/Input';
 import { Button } from '../components/common/Button';
 import { validateEmail } from '../utils/validators';
+import { useSmoothProgress } from '../hooks/useSmoothProgress';
+import { ProgressBar } from '../components/common/ProgressBar';
 
 export const Login: FC = () => {
   const [email, setEmail] = useState('');
@@ -12,6 +14,7 @@ export const Login: FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const progress = useSmoothProgress(isLoading);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -44,22 +47,23 @@ export const Login: FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
+    <div className="relative min-h-screen bg-gradient-to-br from-primary-50 via-slate-50 to-primary-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      <ProgressBar progress={progress} />
       <div className="w-full max-w-md">
         {/* Logo & Title */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-2xl shadow-lg mb-4">
-            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl shadow-lg mb-3 sm:mb-4">
+            <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Voucher Management</h1>
-          <p className="text-gray-600 mt-2">Sign in to manage your vouchers</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Voucher Management</h1>
+          <p className="text-slate-600 mt-2 font-medium text-sm sm:text-base">Sign in to manage your vouchers</p>
         </div>
 
         {/* Login Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 sm:p-8">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             <Input
               label="Email Address"
               type="email"
@@ -102,15 +106,15 @@ export const Login: FC = () => {
           </form>
 
           {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-600 text-center">
+          <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg border border-slate-200">
+            <p className="text-xs sm:text-sm text-slate-600 text-center font-medium">
               <strong>Demo:</strong> Use any email and password to login
             </p>
           </div>
         </div>
 
         {/* Footer */}
-        <p className="text-center text-sm text-gray-600 mt-6">
+        <p className="text-center text-sm text-slate-600 mt-6 font-medium">
           © 2025 Voucher Management System
         </p>
       </div>
