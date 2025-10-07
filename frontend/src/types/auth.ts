@@ -9,3 +9,7 @@ export interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => void;
 }
+
+export interface LoginResponse {
+  token: string;
+}

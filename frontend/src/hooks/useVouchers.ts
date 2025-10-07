@@ -1,6 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
-import type { Voucher, VoucherFormData } from '../types/voucher';
-import { mockVouchers, getNextId, simulateDelay } from '../data/mockVouchers';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { apiClient } from '../api/axios';
+import type {
+  Voucher,
+  VoucherFormData,
+  VouchersResponse,
+  PaginationMeta,
+  CSVUploadResult,
+} from '../types/voucher';
 
 interface UseVouchersOptions {
   search?: string;
@@ -10,43 +16,82 @@ interface UseVouchersOptions {
   limit?: number;
 }
 
-// Simulate localStorage for persistence
-const STORAGE_KEY = 'vouchers_data';
+interface QueryParams {
+  search: string;
+  sortField: 'expiry_date' | 'discount_percent';
+  sortOrder: 'asc' | 'desc';
+  page: number;
+  limit: number;
+}
 
-const getStoredVouchers = (): Voucher[] => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : mockVouchers;
-  } catch {
-    return mockVouchers;
-  }
+const DEFAULT_LIMIT = 10;
+
+const normaliseParams = (params: Partial<UseVouchersOptions>, current: QueryParams): QueryParams => {
+  const limit = params.limit ?? current.limit ?? DEFAULT_LIMIT;
+  const page = params.page ?? current.page ?? 1;
+
+  return {
+    search: params.search ?? current.search ?? '',
+    sortField: params.sortField ?? current.sortField ?? 'expiry_date',
+    sortOrder:
+      params.sortOrder === 'desc' ? 'desc' : params.sortOrder === 'asc' ? 'asc' : current.sortOrder ?? 'asc',
+    page: page > 0 ? page : 1,
+    limit: limit > 0 ? Math.min(limit, 100) : DEFAULT_LIMIT,
+  };
 };
 
-const setStoredVouchers = (vouchers: Voucher[]): void => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(vouchers));
-  } catch (error) {
-    console.error('Failed to save vouchers:', error);
+const buildQueryString = (params: QueryParams): string => {
+  const searchParams = new URLSearchParams();
+
+  if (params.search) {
+    searchParams.set('q', params.search);
   }
+
+  if (params.sortField) {
+    searchParams.set('sort', params.sortField);
+  }
+
+  if (params.sortOrder) {
+    searchParams.set('order', params.sortOrder);
+  }
+
+  searchParams.set('page', String(params.page));
+  searchParams.set('limit', String(params.limit));
+
+  return searchParams.toString();
 };
 
 export const useVouchers = (options: UseVouchersOptions = {}) => {
+  const paramsRef = useRef<QueryParams>({
+    search: options.search ?? '',
+    sortField: options.sortField ?? 'expiry_date',
+    sortOrder: options.sortOrder ?? 'asc',
+    page: options.page ?? 1,
+    limit: options.limit ?? DEFAULT_LIMIT,
+  });
+
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
+  const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [total, setTotal] = useState(0);
 
-  const fetchVouchers = useCallback(async () => {
+  const fetchVouchers = useCallback(async (override: Partial<UseVouchersOptions> = {}) => {
+    const nextParams = normaliseParams(override, paramsRef.current);
+    paramsRef.current = nextParams;
+
+    const queryString = buildQueryString(paramsRef.current);
+    const endpoint = queryString ? `/vouchers?${queryString}` : '/vouchers';
+
     setIsLoading(true);
     setError(null);
-    
+
     try {
-      // Simulate API call delay
-      await simulateDelay(300);
-      
-      const storedVouchers = getStoredVouchers();
-      setVouchers(storedVouchers);
-      setTotal(storedVouchers.length);
+  const response = await apiClient.get<VouchersResponse | null>(endpoint);
+  const safeData = response && Array.isArray(response.data) ? response.data : [];
+  const safePagination = response && response.pagination ? response.pagination : null;
+
+  setVouchers(safeData);
+  setPagination(safePagination);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch vouchers');
     } finally {
@@ -54,167 +99,84 @@ export const useVouchers = (options: UseVouchersOptions = {}) => {
     }
   }, []);
 
-  const createVoucher = async (data: VoucherFormData): Promise<Voucher> => {
-    await simulateDelay(500);
-    
-    const storedVouchers = getStoredVouchers();
-    
-    // Check for duplicate voucher code
-    const isDuplicate = storedVouchers.some(
-      v => v.voucher_code.toLowerCase() === data.voucher_code.toLowerCase()
-    );
-    
-    if (isDuplicate) {
-      throw new Error('Voucher code already exists');
-    }
-    
-    const newVoucher: Voucher = {
-      id: getNextId(),
-      voucher_code: data.voucher_code,
-      discount_percent: Number(data.discount_percent),
-      expiry_date: new Date(data.expiry_date).toISOString(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    
-    const updatedVouchers = [newVoucher, ...storedVouchers];
-    setStoredVouchers(updatedVouchers);
-    setVouchers(updatedVouchers);
-    
-    return newVoucher;
-  };
-
-  const updateVoucher = async (id: number, data: VoucherFormData): Promise<Voucher> => {
-    await simulateDelay(500);
-    
-    const storedVouchers = getStoredVouchers();
-    const index = storedVouchers.findIndex(v => v.id === id);
-    
-    if (index === -1) {
-      throw new Error('Voucher not found');
-    }
-    
-    // Check for duplicate voucher code (excluding current voucher)
-    const isDuplicate = storedVouchers.some(
-      v => v.id !== id && v.voucher_code.toLowerCase() === data.voucher_code.toLowerCase()
-    );
-    
-    if (isDuplicate) {
-      throw new Error('Voucher code already exists');
-    }
-    
-    const updatedVoucher: Voucher = {
-      ...storedVouchers[index],
-      voucher_code: data.voucher_code,
-      discount_percent: Number(data.discount_percent),
-      expiry_date: new Date(data.expiry_date).toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    
-    const updatedVouchers = [...storedVouchers];
-    updatedVouchers[index] = updatedVoucher;
-    
-    setStoredVouchers(updatedVouchers);
-    setVouchers(updatedVouchers);
-    
-    return updatedVoucher;
-  };
-
-  const deleteVoucher = async (id: number): Promise<void> => {
-    await simulateDelay(300);
-    
-    const storedVouchers = getStoredVouchers();
-    const updatedVouchers = storedVouchers.filter(v => v.id !== id);
-    
-    setStoredVouchers(updatedVouchers);
-    setVouchers(updatedVouchers);
-  };
-
-  const getVoucher = async (id: number): Promise<Voucher> => {
-    await simulateDelay(200);
-    
-    const storedVouchers = getStoredVouchers();
-    const voucher = storedVouchers.find(v => v.id === id);
-    
-    if (!voucher) {
-      throw new Error('Voucher not found');
-    }
-    
-    return voucher;
-  };
-
-  const bulkCreateVouchers = async (dataList: VoucherFormData[]): Promise<{ success: number; failed: number; errors: string[] }> => {
-    await simulateDelay(800);
-    
-    const storedVouchers = getStoredVouchers();
-    const result = {
-      success: 0,
-      failed: 0,
-      errors: [] as string[],
-    };
-    
-    const newVouchers: Voucher[] = [];
-    
-    for (let i = 0; i < dataList.length; i++) {
-      try {
-        const data = dataList[i];
-        
-        // Check for duplicate in existing vouchers
-        const isDuplicate = storedVouchers.some(
-          v => v.voucher_code.toLowerCase() === data.voucher_code.toLowerCase()
-        );
-        
-        // Check for duplicate in new vouchers batch
-        const isDuplicateInBatch = newVouchers.some(
-          v => v.voucher_code.toLowerCase() === data.voucher_code.toLowerCase()
-        );
-        
-        if (isDuplicate || isDuplicateInBatch) {
-          result.failed++;
-          result.errors.push(`Row ${i + 1}: Voucher code "${data.voucher_code}" already exists`);
-          continue;
-        }
-        
-        const newVoucher: Voucher = {
-          id: getNextId() + newVouchers.length,
-          voucher_code: data.voucher_code,
-          discount_percent: Number(data.discount_percent),
-          expiry_date: new Date(data.expiry_date).toISOString(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-        
-        newVouchers.push(newVoucher);
-        result.success++;
-      } catch (error) {
-        result.failed++;
-        result.errors.push(`Row ${i + 1}: ${error instanceof Error ? error.message : 'Failed to create'}`);
-      }
-    }
-    
-    if (newVouchers.length > 0) {
-      const updatedVouchers = [...newVouchers, ...storedVouchers];
-      setStoredVouchers(updatedVouchers);
-      setVouchers(updatedVouchers);
-    }
-    
-    return result;
-  };
-
   useEffect(() => {
     fetchVouchers();
-  }, [fetchVouchers]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const refetch = useCallback(
+    (override: Partial<UseVouchersOptions> = {}) => fetchVouchers(override),
+    [fetchVouchers],
+  );
+
+  const createVoucher = useCallback(
+    async (data: VoucherFormData) => {
+      const payload = {
+        voucher_code: data.voucher_code.trim(),
+        discount_percent: Number(data.discount_percent),
+        expiry_date: data.expiry_date,
+      };
+
+      const created = await apiClient.post<Voucher>('/vouchers', payload);
+      await fetchVouchers();
+      return created;
+    },
+    [fetchVouchers],
+  );
+
+  const updateVoucher = useCallback(
+    async (id: number, data: VoucherFormData) => {
+      const payload = {
+        voucher_code: data.voucher_code.trim(),
+        discount_percent: Number(data.discount_percent),
+        expiry_date: data.expiry_date,
+      };
+
+      const updated = await apiClient.put<Voucher>(`/vouchers/${id}`, payload);
+      await fetchVouchers();
+      return updated;
+    },
+    [fetchVouchers],
+  );
+
+  const deleteVoucher = useCallback(
+    async (id: number) => {
+      await apiClient.delete(`/vouchers/${id}`);
+      await fetchVouchers();
+    },
+    [fetchVouchers],
+  );
+
+  const getVoucher = useCallback(async (id: number) => {
+    return apiClient.get<Voucher>(`/vouchers/${id}`);
+  }, []);
+
+  const uploadCSV = useCallback(
+    async (file: File) => {
+      const result = await apiClient.uploadCSV<CSVUploadResult>('/vouchers/upload-csv', file);
+      await fetchVouchers();
+      return result;
+    },
+    [fetchVouchers],
+  );
+
+  const downloadCSV = useCallback(async () => {
+    return apiClient.downloadCSV('/vouchers/export');
+  }, []);
 
   return {
     vouchers,
+    pagination,
     isLoading,
     error,
-    total,
-    refetch: fetchVouchers,
+    params: paramsRef.current,
+    refetch,
+    fetchVouchers: refetch,
     createVoucher,
     updateVoucher,
     deleteVoucher,
     getVoucher,
-    bulkCreateVouchers,
+    uploadCSV,
+    downloadCSV,
   };
 };

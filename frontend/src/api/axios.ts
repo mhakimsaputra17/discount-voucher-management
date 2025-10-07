@@ -3,7 +3,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 interface RequestOptions {
   method: string;
   headers: Record<string, string>;
-  body?: string;
+  body?: BodyInit | null;
 }
 
 class ApiClient {
@@ -20,8 +20,9 @@ class ApiClient {
 
   async request<T>(endpoint: string, options: Partial<RequestOptions> = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
-    const headers = {
-      'Content-Type': 'application/json',
+    const isFormData = options.body instanceof FormData;
+    const headers: Record<string, string> = {
+      ...(!isFormData ? { 'Content-Type': 'application/json' } : {}),
       ...this.getAuthHeader(),
       ...options.headers,
     };
@@ -40,7 +41,22 @@ class ApiClient {
         throw new Error(error.message || `HTTP ${response.status}`);
       }
 
-      return await response.json();
+      if (response.status === 204) {
+        return undefined as T;
+      }
+
+      const contentLength = response.headers.get('content-length');
+      if (contentLength === '0') {
+        return undefined as T;
+      }
+
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        return await response.json();
+      }
+
+      const text = await response.text();
+      return text as unknown as T;
     } catch (error) {
       if (error instanceof Error) {
         throw error;
@@ -67,8 +83,8 @@ class ApiClient {
     });
   }
 
-  delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, {
+  delete(endpoint: string): Promise<void> {
+    return this.request<void>(endpoint, {
       method: 'DELETE',
     });
   }
