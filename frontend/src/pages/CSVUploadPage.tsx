@@ -1,33 +1,38 @@
-import { FC, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { CSVUpload } from '../components/voucher/CSVUpload';
 import { useToast } from '../hooks/useToast';
 import { useVouchers } from '../hooks/useVouchers';
-import type { VoucherFormData } from '../types/voucher';
+import type { CSVUploadResult } from '../types/voucher';
+import { ProgressBar } from '../components/common/ProgressBar';
+import { useSmoothProgress } from '../hooks/useSmoothProgress';
+import { Button } from '../components/common/Button';
 
 export const CSVUploadPage: FC = () => {
   const { showToast } = useToast();
-  const { bulkCreateVouchers, refetch } = useVouchers();
-  const [uploadResult, setUploadResult] = useState<{
-    success: number;
-    failed: number;
-    errors: string[];
-  } | null>(null);
+  const { uploadCSV, refetch } = useVouchers();
+  const [uploadResult, setUploadResult] = useState<CSVUploadResult | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSampleDownloading, setIsSampleDownloading] = useState(false);
+  const progress = useSmoothProgress(isUploading || isSampleDownloading);
 
-  const handleUpload = async (data: VoucherFormData[]) => {
+  const handleUpload = async (file: File) => {
     try {
-      const result = await bulkCreateVouchers(data);
+  const result = await uploadCSV(file);
       setUploadResult(result);
-      
+
       await refetch();
 
-      if (result.failed === 0) {
-        showToast(`Successfully uploaded ${result.success} vouchers`, 'success');
-      } else if (result.success === 0) {
-        showToast(`Failed to upload all ${result.failed} vouchers`, 'error');
+      const successCount = result?.success_count ?? 0;
+      const failureCount = result?.failure_count ?? 0;
+
+      if (failureCount === 0) {
+        showToast(`Successfully uploaded ${successCount} vouchers`, 'success');
+      } else if (successCount === 0) {
+        showToast(`Failed to upload all ${failureCount} vouchers`, 'error');
       } else {
         showToast(
-          `Uploaded ${result.success} vouchers, ${result.failed} failed`,
+          `Uploaded ${successCount} vouchers, ${failureCount} failed`,
           'warning'
         );
       }
@@ -37,8 +42,39 @@ export const CSVUploadPage: FC = () => {
     }
   };
 
+  const handleUploadingChange = useCallback((loading: boolean) => {
+    setIsUploading(loading);
+  }, []);
+
+  const handleSampleDownload = useCallback(async () => {
+    if (isSampleDownloading) {
+      return;
+    }
+
+    setIsSampleDownloading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      const sampleCSV = `voucher_code,discount_percent,expiry_date
+SAMPLE2025,15,2025-12-31
+TESTOFFER,20,2025-11-30
+DEMO50,50,2025-10-31`;
+      const blob = new Blob([sampleCSV], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'sample-vouchers.csv';
+      link.click();
+      URL.revokeObjectURL(url);
+      await new Promise(resolve => setTimeout(resolve, 150));
+    } finally {
+      setIsSampleDownloading(false);
+    }
+  }, [isSampleDownloading]);
+
   return (
     <Layout>
+      <ProgressBar progress={progress} />
       <div className="max-w-4xl mx-auto px-4 sm:px-0">
         {/* Header */}
         <div className="mb-4 sm:mb-6">
@@ -90,13 +126,19 @@ export const CSVUploadPage: FC = () => {
 
         {/* Upload Component */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8">
-          <CSVUpload onUpload={handleUpload} />
+          <CSVUpload onUpload={handleUpload} onUploadingChange={handleUploadingChange} />
         </div>
 
         {/* Upload Results */}
         {uploadResult && (
           <div className="mt-4 sm:mt-6 bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
             <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-3 sm:mb-4">Upload Results</h3>
+            {(() => {
+              const successCount = uploadResult?.success_count ?? 0;
+              const failureCount = uploadResult?.failure_count ?? 0;
+              const failures = uploadResult?.failures ?? [];
+              return (
+                <>
             
             <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-3 sm:mb-4">
               <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
@@ -106,9 +148,9 @@ export const CSVUploadPage: FC = () => {
                   </svg>
                   <span className="font-medium text-sm sm:text-base">Success</span>
                 </div>
-                <p className="text-xl sm:text-2xl font-bold text-green-900 mt-1 sm:mt-2">{uploadResult.success}</p>
+                <p className="text-xl sm:text-2xl font-bold text-green-900 mt-1 sm:mt-2">{successCount}</p>
               </div>
-              
+
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
                 <div className="flex items-center gap-1 sm:gap-2 text-red-800">
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -116,23 +158,26 @@ export const CSVUploadPage: FC = () => {
                   </svg>
                   <span className="font-medium text-sm sm:text-base">Failed</span>
                 </div>
-                <p className="text-xl sm:text-2xl font-bold text-red-900 mt-1 sm:mt-2">{uploadResult.failed}</p>
+                <p className="text-xl sm:text-2xl font-bold text-red-900 mt-1 sm:mt-2">{failureCount}</p>
               </div>
             </div>
 
-            {uploadResult.errors.length > 0 && (
+            {failures.length > 0 && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
                 <h4 className="font-medium text-red-900 mb-2">Errors:</h4>
                 <ul className="space-y-1 text-sm text-red-800 max-h-48 overflow-y-auto">
-                  {uploadResult.errors.map((error, index) => (
-                    <li key={index} className="flex items-start gap-2">
+                  {failures.map((failure, index) => (
+                    <li key={`${failure.row}-${index}`} className="flex items-start gap-2">
                       <span className="text-red-500 mt-0.5">•</span>
-                      <span>{error}</span>
+                      <span>{`Row ${failure.row}: ${failure.reason}`}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             )}
+                </>
+              );
+            })()}
           </div>
         )}
 
@@ -195,27 +240,18 @@ export const CSVUploadPage: FC = () => {
           <p className="text-sm text-slate-600 mb-4">
             Download a sample CSV file to see the correct format.
           </p>
-          <button
-            onClick={() => {
-              const sampleCSV = `voucher_code,discount_percent,expiry_date
-SAMPLE2025,15,2025-12-31
-TESTOFFER,20,2025-11-30
-DEMO50,50,2025-10-31`;
-              const blob = new Blob([sampleCSV], { type: 'text/csv' });
-              const url = URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.href = url;
-              link.download = 'sample-vouchers.csv';
-              link.click();
-              URL.revokeObjectURL(url);
-            }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors"
+          <Button
+            onClick={handleSampleDownload}
+            variant="primary"
+            isLoading={isSampleDownloading}
+            disabled={isSampleDownloading}
+            className="gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             Download Sample CSV
-          </button>
+          </Button>
         </div>
       </div>
     </Layout>

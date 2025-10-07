@@ -4,6 +4,8 @@ import { useAuth } from '../hooks/useAuth';
 import { Input } from '../components/common/Input';
 import { Button } from '../components/common/Button';
 import { validateEmail } from '../utils/validators';
+import { useSmoothProgress } from '../hooks/useSmoothProgress';
+import { ProgressBar } from '../components/common/ProgressBar';
 
 export const Login: FC = () => {
   const [email, setEmail] = useState('');
@@ -12,6 +14,7 @@ export const Login: FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const progress = useSmoothProgress(isLoading);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -44,7 +47,8 @@ export const Login: FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-slate-50 to-primary-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div className="relative min-h-screen bg-gradient-to-br from-primary-50 via-slate-50 to-primary-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      <ProgressBar progress={progress} />
       <div className="w-full max-w-md">
         {/* Logo & Title */}
         <div className="text-center mb-6 sm:mb-8">

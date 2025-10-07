@@ -20,25 +20,28 @@ export const VoucherFormPage: FC = () => {
   const isEditMode = !!id;
 
   useEffect(() => {
-    if (id) {
-      const fetchVoucher = async () => {
-        try {
-          const voucher = await getVoucher(Number(id));
-          setInitialData({
-            voucher_code: voucher.voucher_code,
-            discount_percent: voucher.discount_percent,
-            expiry_date: formatDateForInput(voucher.expiry_date),
-          });
-        } catch (error) {
-          showToast('Failed to load voucher', 'error');
-          navigate('/vouchers');
-        } finally {
-          setIsFetching(false);
-        }
-      };
-      fetchVoucher();
+    if (!id) {
+      return;
     }
-  }, [id]);
+
+    const fetchVoucher = async () => {
+      try {
+        const voucher = await getVoucher(Number(id));
+        setInitialData({
+          voucher_code: voucher.voucher_code,
+          discount_percent: voucher.discount_percent,
+          expiry_date: formatDateForInput(voucher.expiry_date),
+        });
+      } catch (error) {
+        showToast('Failed to load voucher', 'error');
+        navigate('/vouchers');
+      } finally {
+        setIsFetching(false);
+      }
+    };
+
+    fetchVoucher();
+  }, [getVoucher, id, navigate, showToast]);
 
   const handleSubmit = async (data: VoucherFormData) => {
     setIsLoading(true);

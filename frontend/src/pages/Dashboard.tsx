@@ -7,7 +7,7 @@ import { useVouchers } from '../hooks/useVouchers';
 
 export const Dashboard: FC = () => {
   const navigate = useNavigate();
-  const { vouchers, isLoading } = useVouchers();
+  const { vouchers, isLoading, error } = useVouchers({ limit: 100, sortField: 'expiry_date', sortOrder: 'asc' });
 
   // Calculate statistics
   const stats = useMemo(() => {
@@ -46,6 +46,18 @@ export const Dashboard: FC = () => {
       <Layout>
         <div className="flex items-center justify-center min-h-[60vh]">
           <Spinner size="lg" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+            {error}
+          </p>
         </div>
       </Layout>
     );

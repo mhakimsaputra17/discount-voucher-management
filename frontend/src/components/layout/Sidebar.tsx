@@ -1,6 +1,8 @@
 import { FC, useState, ReactElement } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useSmoothProgress } from '../../hooks/useSmoothProgress';
+import { ProgressBar } from '../common/ProgressBar';
 
 interface MenuItem {
   path: string;
@@ -12,8 +14,10 @@ interface MenuItem {
 export const Sidebar: FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { logout } = useAuth();
   const location = useLocation();
+  const progress = useSmoothProgress(isLoggingOut);
 
   const menuItems: MenuItem[] = [
     {
@@ -45,9 +49,19 @@ export const Sidebar: FC = () => {
     return false;
   };
 
-  const handleLogout = () => {
-    logout();
-    setIsMobileOpen(false);
+  const handleLogout = async () => {
+    if (isLoggingOut) {
+      return;
+    }
+
+    setIsLoggingOut(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      logout();
+      setIsMobileOpen(false);
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   const closeMobileMenu = () => {
@@ -56,6 +70,7 @@ export const Sidebar: FC = () => {
 
   return (
     <>
+      <ProgressBar progress={progress} />
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
@@ -198,11 +213,13 @@ export const Sidebar: FC = () => {
           {/* Logout Button */}
           <button
             onClick={handleLogout}
+            disabled={isLoggingOut}
             className={`
               w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
               text-red-600 hover:bg-red-50 hover:text-red-700 hover:shadow-md
               active:scale-95 transition-all duration-200 ease-in-out font-medium
               ${isCollapsed ? 'justify-center' : ''}
+              ${isLoggingOut ? 'opacity-60 cursor-not-allowed' : ''}
             `}
             title={isCollapsed ? 'Logout' : ''}
           >

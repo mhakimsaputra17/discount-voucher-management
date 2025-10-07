@@ -4,14 +4,20 @@ import { parseCSV } from '../../utils/csv';
 import type { VoucherFormData } from '../../types/voucher';
 
 interface CSVUploadProps {
-  onUpload: (data: VoucherFormData[]) => Promise<void>;
+  onUpload: (file: File) => Promise<void>;
+  onUploadingChange?: (isUploading: boolean) => void;
 }
 
-export const CSVUpload: FC<CSVUploadProps> = ({ onUpload }) => {
+export const CSVUpload: FC<CSVUploadProps> = ({ onUpload, onUploadingChange }) => {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<VoucherFormData[]>([]);
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const setLoading = (value: boolean) => {
+    setIsLoading(value);
+    onUploadingChange?.(value);
+  };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -42,34 +48,31 @@ export const CSVUpload: FC<CSVUploadProps> = ({ onUpload }) => {
   const handleUpload = async () => {
     if (!file) return;
 
-    setIsLoading(true);
+    setLoading(true);
+    setError('');
     try {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        try {
-          const content = event.target?.result as string;
-          const data = parseCSV(content);
-          await onUpload(data);
-          setFile(null);
-          setPreview([]);
-        } catch (err) {
-          setError(err instanceof Error ? err.message : 'Upload failed');
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      reader.readAsText(file);
+      await onUpload(file);
+      setFile(null);
+      setPreview([]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed');
-      setIsLoading(false);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="space-y-6">
       {/* File Upload */}
-            {/* File Upload */}
-      <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 sm:p-8 text-center hover:border-primary-400 hover:bg-primary-50/30 transition-all">
+      <div className="relative border-2 border-dashed border-slate-300 rounded-xl p-6 sm:p-8 text-center hover:border-primary-400 hover:bg-primary-50/30 transition-all">
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/80 backdrop-blur-[1px] rounded-xl flex flex-col items-center justify-center gap-2 text-primary-600">
+            <svg className="w-6 h-6 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 12a8 8 0 018-8V2m0 20v-2a8 8 0 008-8" />
+            </svg>
+            <span className="text-sm font-medium">Uploading vouchers…</span>
+          </div>
+        )}
         <input
           type="file"
           accept=".csv"
@@ -78,7 +81,7 @@ export const CSVUpload: FC<CSVUploadProps> = ({ onUpload }) => {
           id="csv-upload"
           disabled={isLoading}
         />
-        <label htmlFor="csv-upload" className="cursor-pointer">
+        <label htmlFor="csv-upload" className={`cursor-pointer ${isLoading ? 'opacity-60 pointer-events-none' : ''}`}>
           <svg className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
           </svg>
@@ -149,7 +152,7 @@ export const CSVUpload: FC<CSVUploadProps> = ({ onUpload }) => {
             disabled={isLoading || preview.length === 0}
             className="w-full sm:w-auto"
           >
-            Upload {preview.length > 5 ? `All Rows` : `${preview.length} Row${preview.length > 1 ? 's' : ''}`}
+            Upload File
           </Button>
         </div>
       )}
