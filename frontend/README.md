@@ -1,151 +1,197 @@
-# 🎫 Voucher Management System - Frontend
+# ⚛️ Discount Voucher Management - Frontend
 
-Modern, responsive web application for managing discount vouchers built with **React 18**, **TypeScript**, and **Tailwind CSS 4.1**.
+> **Modern, responsive web application untuk mengelola voucher diskon, dibangun dengan React 19, TypeScript, Vite, dan Tailwind CSS 4.**
 
-## ✨ Features
+Frontend aplikasi yang powerful dan user-friendly untuk manajemen voucher diskon dengan fitur CRUD lengkap, CSV import/export, real-time search, sorting, pagination, dan UI/UX yang modern.
 
-- 🔐 **Authentication**: Dummy login system with token-based auth
-- 📊 **Voucher Management**: Full CRUD operations for vouchers
-- 🔍 **Search & Filter**: Real-time search by voucher code
-- 📈 **Sorting**: Sort by expiry date or discount percentage
-- 📄 **Pagination**: Client-side pagination (10 items per page)
-- 📤 **CSV Export**: Download vouchers as CSV file
-- 📥 **CSV Import**: Bulk upload vouchers via CSV with preview
-- 💾 **Local Storage**: Data persists in browser localStorage
-- 🎨 **Modern UI**: Clean, minimalist design with smooth animations
-- 📱 **Fully Responsive**: Works perfectly on mobile, tablet, and desktop
-- ⚡ **Performance**: Optimized with React and Vite
+---
 
-## 🛠️ Tech Stack
+## 📋 Daftar Isi
 
-- **React 18** - Latest stable React
-- **TypeScript 5.3** - Type safety and better DX
-- **Vite 5** - Lightning-fast build tool and dev server
-- **Tailwind CSS 4.1** - Via Play CDN (no build step needed)
-- **React Router v6** - Declarative client-side routing
-- **LocalStorage** - Client-side data persistence
+- [Teknologi Stack](#-teknologi-stack)
+- [Fitur](#-fitur)
+- [Prasyarat](#-prasyarat)
+- [Instalasi](#-instalasi)
+- [Konfigurasi](#-konfigurasi)
+- [Menjalankan Aplikasi](#-menjalankan-aplikasi)
+- [Project Structure](#-project-structure)
+- [Komponen Utama](#-komponen-utama)
+- [Halaman & Routing](#-halaman--routing)
+- [Testing](#-testing)
 
-## 📋 Prerequisites
+---
 
-- **Node.js** >= 18.0.0
-- **pnpm** >= 8.0.0 (recommended) or npm >= 9.0.0
+## 🛠️ Teknologi Stack
 
-## 🚀 Quick Start
+| Teknologi | Versi Minimal | Deskripsi |
+|-----------|---------------|-----------|
+| **Node.js** | 18.0.0+ | JavaScript runtime environment |
+| **pnpm** | 8.0.0+ | Package manager (disarankan) |
+| **npm** | 9.0.0+ | Alternative package manager |
+| **React** | 19.1.1+ | UI library dengan hooks modern |
+| **TypeScript** | 5.9.3+ | Typed superset JavaScript |
+| **Vite** | 7.1.7+ | Lightning-fast build tool |
+| **Tailwind CSS** | 4.1.14+ | Utility-first CSS framework |
+| **React Router** | 7.9.3+ | Declarative routing untuk React |
 
-### 1. Install dependencies
+### Dependencies (dari package.json)
+```json
+{
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.14",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.3",
+    "tailwindcss": "^4.1.14"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.16",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.4",
+    "typescript": "~5.9.3",
+    "vite": "^7.1.7",
+    "eslint": "^9.36.0"
+  }
+}
+```
 
+---
+
+## ✨ Fitur
+
+### 🔐 Autentikasi
+- Login page dengan dummy authentication
+- Token-based auth disimpan di localStorage
+- Protected routes dengan redirect
+- Logout functionality
+
+### 📊 Voucher Management
+- ✅ **Create**: Form create voucher dengan validasi real-time
+- ✅ **Read**: List voucher dengan tabel responsive
+- ✅ **Update**: Edit voucher dengan form terisi otomatis
+- ✅ **Delete**: Hapus voucher dengan konfirmasi modal
+- 📊 **Statistics**: Total vouchers, active, expired
+
+### 🔍 Advanced Features
+- **Search**: Filter voucher berdasarkan kode (real-time)
+- **Sort**: Urutkan berdasarkan expiry date atau discount percent (ASC/DESC)
+- **Pagination**: Client-side pagination (10 items per page)
+- **Loading States**: Skeleton loaders & spinners
+- **Empty States**: Friendly messages saat data kosong
+
+### 📥 CSV Operations
+- **Import CSV**: 
+  - Upload file CSV
+  - Preview 5 row pertama sebelum upload
+  - Validasi per-row dengan error reporting
+  - Download sample CSV template
+  - Duplicate detection
+- **Export CSV**: Download semua voucher dalam format CSV
+
+### 🎨 User Interface
+- Modern & minimalist design
+- Fully responsive (mobile, tablet, desktop)
+- Smooth animations & transitions
+- Toast notifications (success/error/info)
+- Modal dialogs
+- Progress bars
+- Custom styled form inputs
+- Color-coded status badges (Active/Expired)
+
+### ⚡ Performance
+- React 19 dengan optimized rendering
+- Vite untuk fast development & build
+- Code splitting & lazy loading (ready)
+- Memoization dengan useMemo/useCallback
+- Debounced search
+
+---
+
+## 📦 Prasyarat
+
+Pastikan sistem Anda telah menginstall:
+
+### 1. **Node.js**
+```bash
+# Cek versi (minimal 18.0.0)
+node --version
+```
+Download dari: https://nodejs.org/
+
+### 2. **Package Manager**
+
+**Opsi A: pnpm (Disarankan)**
+```bash
+# Install pnpm globally
+npm install -g pnpm
+
+# Cek versi (minimal 8.0.0)
+pnpm --version
+```
+
+**Opsi B: npm**
+```bash
+# Cek versi (minimal 9.0.0)
+npm --version
+```
+
+### 3. **Git**
+```bash
+git --version
+```
+
+---
+
+## 🚀 Instalasi
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/mhakimsaputra17/discount-voucher-management.git
+cd discount-voucher-management/frontend
+```
+
+### 2. Install Dependencies
+
+**Menggunakan pnpm (Disarankan):**
 ```bash
 pnpm install
 ```
 
-### 2. Run development server
-
+**Menggunakan npm:**
 ```bash
-pnpm dev
+npm install
 ```
 
-The app will be available at `http://localhost:3000`
+### 3. Konfigurasi Environment (Optional)
 
-### 3. Login
-
-Use any email and password to login (dummy authentication)
-
-**Example:**
-- Email: `admin@example.com`
-- Password: `password`
-
-## 📦 Installation Details
-
-Only these packages are needed (Tailwind via CDN):
-
+Jika backend berjalan di URL lain, buat file `.env`:
 ```bash
-# Dependencies
-pnpm add react@18 react-dom@18 react-router-dom@6
+# Windows
+copy .env.example .env
 
-# Dev Dependencies
-pnpm add -D vite@5 @vitejs/plugin-react@4 typescript@5 @types/react@18 @types/react-dom@18
+# Linux/Mac
+cp .env.example .env
 ```
 
-## 🎯 Features in Detail
-
-### 📊 Voucher Management
-- ✅ **Create**: Add new vouchers with real-time validation
-- ✅ **Read**: View all vouchers with search and sort
-- ✅ **Update**: Edit existing voucher details
-- ✅ **Delete**: Remove vouchers with confirmation modal
-- ✅ **Stats**: Real-time statistics (total, active, expired)
-
-### 📥 CSV Import
-- Upload CSV files with multiple vouchers
-- Preview data before uploading (first 5 rows)
-- Validation for duplicate voucher codes
-- Detailed error reporting per row
-- Download sample CSV template
-
-### 📤 CSV Export
-- Download all vouchers as CSV
-- Proper CSV formatting
-- Opens directly in Excel/Google Sheets
-
-### 💾 Data Persistence
-- All data stored in browser localStorage
-- Survives page refresh
-- Pre-loaded with 12 sample vouchers
-- Easy to reset (clear localStorage)
-
-## 🎨 Sample Data
-
-The app comes with **12 pre-loaded vouchers**:
-
-| Code | Discount | Expiry Date | Status |
-|------|----------|-------------|--------|
-| SUMMER2025 | 25% | 2025-12-31 | ✅ Active |
-| WELCOME10 | 10% | 2025-11-30 | ✅ Active |
-| FLASH50 | 50% | 2025-06-15 | ✅ Active |
-| NEWYEAR2025 | 30% | 2025-01-31 | ❌ Expired |
-| BLACKFRIDAY | 40% | 2025-11-29 | ✅ Active |
-| STUDENT15 | 15% | 2025-12-31 | ✅ Active |
-| EARLYBIRD | 20% | 2025-03-31 | ✅ Active |
-| WEEKEND20 | 20% | 2025-12-31 | ✅ Active |
-| VALENTINE | 35% | 2025-02-14 | ❌ Expired |
-| SPRING2025 | 25% | 2025-05-31 | ✅ Active |
-| LOYALTY50 | 50% | 2025-12-31 | ✅ Active |
-| FIRSTBUY | 12% | 2025-12-31 | ✅ Active |
-
-## 📁 Project Structure
-
-```
-src/
-├── data/                  # Mock data and helpers
-│   └── mockVouchers.ts   # 12 pre-loaded vouchers
-├── components/           # Reusable UI components
-│   ├── common/          # Button, Input, Modal, Toast, Spinner
-│   ├── layout/          # Header, Layout
-│   └── voucher/         # Voucher-specific components
-├── context/             # AuthContext, ToastContext
-├── hooks/               # useAuth, useToast, useVouchers
-├── pages/               # Login, VoucherList, VoucherForm, CSVUpload
-├── types/               # TypeScript type definitions
-├── utils/               # CSV, formatters, validators
-├── App.tsx              # Main app with routing
-├── main.tsx             # Entry point
-└── index.css            # Minimal global styles
+**Edit `.env`:**
+```env
+VITE_API_BASE_URL=http://localhost:8080
 ```
 
-## 🔧 Available Scripts
+> **Note:** Default API base URL sudah dikonfigurasi di `src/api/axios.ts` ke `http://localhost:8080`
 
-```bash
-pnpm dev      # Start development server (http://localhost:3000)
-pnpm build    # Build for production (output: dist/)
-pnpm preview  # Preview production build
+---
+
+## ⚙️ Konfigurasi
+
+### API Base URL
+Edit di `src/api/axios.ts`:
+```typescript
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 ```
 
-## 🎨 Tailwind CSS 4.1 via Play CDN
-
-### Configuration
-
-All Tailwind config is in `index.html`:
-
+### Tailwind CSS
+Konfigurasi Tailwind ada di `index.html`:
 ```html
 <script>
   tailwind.config = {
@@ -160,138 +206,574 @@ All Tailwind config is in `index.html`:
 </script>
 ```
 
-### Custom Styles
+### TypeScript
+Konfigurasi di `tsconfig.json` dan `tsconfig.app.json`
 
-```html
-<style type="text/tailwindcss">
-  @layer utilities {
-    .my-custom-class {
-      @apply ...;
+---
+
+## 🎯 Menjalankan Aplikasi
+
+### Development Server
+```bash
+# Menggunakan pnpm
+pnpm dev
+
+# Menggunakan npm
+npm run dev
+```
+
+Aplikasi akan berjalan di:
+- `http://localhost:3000` (jika port 3000 available)
+- `http://localhost:5173` (default Vite port)
+
+### Production Build
+```bash
+# Build
+pnpm build
+# atau: npm run build
+
+# Preview build
+pnpm preview
+# atau: npm run preview
+```
+
+Output di folder `dist/`
+
+### Linting
+```bash
+pnpm lint
+# atau: npm run lint
+```
+
+---
+
+## 📁 Project Structure
+
+```
+frontend/
+├── public/                      # Static assets
+│
+├── src/
+│   ├── main.tsx                # Entry point
+│   ├── App.tsx                 # Root component + routing
+│   ├── index.css               # Global styles
+│   ├── vite-env.d.ts           # Vite type definitions
+│   │
+│   ├── api/                    # API clients
+│   │   └── axios.ts            # Axios instance & interceptors
+│   │
+│   ├── components/             # Reusable components
+│   │   ├── common/             # Generic UI components
+│   │   │   ├── Button.tsx
+│   │   │   ├── Input.tsx
+│   │   │   ├── Modal.tsx
+│   │   │   ├── Toast.tsx
+│   │   │   ├── Spinner.tsx
+│   │   │   └── ProgressBar.tsx
+│   │   │
+│   │   ├── layout/             # Layout components
+│   │   │   ├── Layout.tsx
+│   │   │   ├── Header.tsx
+│   │   │   └── Sidebar.tsx
+│   │   │
+│   │   └── voucher/            # Voucher-specific components
+│   │       ├── VoucherTable.tsx
+│   │       ├── VoucherRow.tsx
+│   │       ├── VoucherForm.tsx
+│   │       ├── SearchBar.tsx
+│   │       ├── Pagination.tsx
+│   │       └── CSVUpload.tsx
+│   │
+│   ├── context/                # React Context
+│   │   ├── AuthContext.tsx     # Auth state management
+│   │   └── ToastContext.tsx    # Toast notifications
+│   │
+│   ├── hooks/                  # Custom React hooks
+│   │   ├── useAuth.ts          # Auth hook
+│   │   ├── useToast.ts         # Toast hook
+│   │   ├── useVouchers.ts      # Voucher operations
+│   │   └── useSmoothProgress.ts # Progress animation
+│   │
+│   ├── pages/                  # Route pages
+│   │   ├── Login.tsx           # Login page
+│   │   ├── Dashboard.tsx       # Dashboard (unused)
+│   │   ├── VoucherListPage.tsx # List vouchers
+│   │   ├── VoucherFormPage.tsx # Create/Edit form
+│   │   └── CSVUploadPage.tsx   # CSV upload
+│   │
+│   ├── types/                  # TypeScript types
+│   │   ├── voucher.ts          # Voucher types
+│   │   └── auth.ts             # Auth types
+│   │
+│   ├── utils/                  # Utility functions
+│   │   ├── csv.ts              # CSV parsing/export
+│   │   ├── date.ts             # Date formatting
+│   │   ├── formatters.ts       # Number/string formatters
+│   │   └── validators.ts       # Form validators
+│   │
+│   └── data/                   # Mock data (optional)
+│       └── mockVouchers.ts     # Sample vouchers
+│
+├── index.html                  # HTML template
+├── package.json                # Dependencies & scripts
+├── vite.config.ts              # Vite configuration
+├── tsconfig.json               # TypeScript config
+├── tsconfig.app.json           # App-specific TS config
+├── eslint.config.js            # ESLint configuration
+└── README.md                   # Dokumentasi ini
+```
+
+---
+
+## 🧩 Komponen Utama
+
+### Context Providers
+
+#### AuthContext
+```typescript
+// Provides authentication state
+const { isAuthenticated, user, login, logout } = useAuth();
+```
+
+#### ToastContext
+```typescript
+// Show notifications
+const { showToast } = useToast();
+showToast('Success!', 'success');
+```
+
+### Custom Hooks
+
+#### useVouchers
+```typescript
+const {
+  vouchers,        // Voucher list
+  loading,         // Loading state
+  pagination,      // Pagination info
+  fetchVouchers,   // Fetch with filters
+  createVoucher,   // Create new
+  updateVoucher,   // Update existing
+  deleteVoucher,   // Delete voucher
+  exportCSV,       // Export to CSV
+  uploadCSV        // Import CSV
+} = useVouchers();
+```
+
+#### useSmoothProgress
+```typescript
+// Animated progress bar
+const progress = useSmoothProgress(isLoading);
+```
+
+### UI Components
+
+#### Button
+```tsx
+<Button variant="primary" size="md" onClick={handleClick}>
+  Click Me
+</Button>
+```
+
+Variants: `primary`, `secondary`, `danger`, `outline`
+Sizes: `sm`, `md`, `lg`
+
+#### Input
+```tsx
+<Input
+  label="Voucher Code"
+  value={code}
+  onChange={(e) => setCode(e.target.value)}
+  error={error}
+  required
+/>
+```
+
+#### Modal
+```tsx
+<Modal
+  isOpen={isOpen}
+  onClose={handleClose}
+  title="Confirm Delete"
+>
+  <p>Are you sure?</p>
+</Modal>
+```
+
+#### Toast
+```tsx
+<Toast
+  message="Success!"
+  type="success"
+  onClose={handleClose}
+/>
+```
+
+Types: `success`, `error`, `info`, `warning`
+
+---
+
+## 📄 Halaman & Routing
+
+### Routes
+
+| Path | Component | Deskripsi |
+|------|-----------|-----------|
+| `/login` | `Login` | Login page (public) |
+| `/vouchers` | `VoucherListPage` | List & manage vouchers (protected) |
+| `/vouchers/new` | `VoucherFormPage` | Create voucher (protected) |
+| `/vouchers/edit/:id` | `VoucherFormPage` | Edit voucher (protected) |
+| `/csv-upload` | `CSVUploadPage` | CSV import (protected) |
+| `/` | Redirect | → `/vouchers` |
+
+### Protected Routes
+```tsx
+<ProtectedRoute>
+  <YourComponent />
+</ProtectedRoute>
+```
+
+Auto redirect ke `/login` jika belum auth.
+
+---
+
+## 🎨 Styling
+
+### Tailwind CSS 4.1
+Aplikasi menggunakan Tailwind CSS via Vite plugin:
+
+**Custom Theme:**
+```javascript
+// vite.config.ts
+export default {
+  theme: {
+    colors: {
+      primary: '#3b82f6',
+      success: '#10b981',
+      danger: '#ef4444'
     }
   }
-</style>
+}
 ```
 
-### Benefits
-
-- ✅ No build step for CSS
-- ✅ Instant Tailwind updates
-- ✅ Built-in plugins (forms, typography)
-- ✅ Smaller dependencies
-- ✅ Faster setup
-
-## 📱 Responsive Design
-
-Fully responsive with Tailwind breakpoints:
-
-- **Mobile**: `< 640px` (sm)
-- **Tablet**: `640px - 1024px` (md, lg)
-- **Desktop**: `> 1024px` (xl, 2xl)
-
-## 🧪 Testing the App
-
-### Create a Voucher
-1. Click "Create Voucher" button
-2. Fill in the form:
-   - Voucher Code: `TEST2025`
-   - Discount: `20`
-   - Expiry Date: `2025-12-31`
-3. Click "Create Voucher"
-4. See success toast notification
-
-### Upload CSV
-1. Go to "CSV Upload" page
-2. Click "Download Sample CSV"
-3. Upload the downloaded file
-4. Preview data
-5. Click "Upload"
-
-### Export CSV
-1. Go to "Vouchers" page
-2. Click "Export CSV" button
-3. CSV file downloads automatically
-
-## 🔄 Reset Data
-
-To reset to original sample data, open browser console:
-
-```javascript
-localStorage.removeItem('vouchers_data');
-// Then refresh the page
+**Utility Classes:**
+```tsx
+<div className="flex items-center justify-between p-4 bg-white rounded-lg shadow">
+  // Content
+</div>
 ```
 
-## 🚀 Production Build
+### Responsive Breakpoints
+- `sm`: 640px
+- `md`: 768px
+- `lg`: 1024px
+- `xl`: 1280px
+- `2xl`: 1536px
 
+**Example:**
+```tsx
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  // Responsive grid
+</div>
+```
+
+---
+
+## 🧪 Testing
+
+### Manual Testing
+
+**1. Login:**
+- Buka `http://localhost:3000/login`
+- Input email & password apapun
+- Klik "Login"
+- Redirect ke `/vouchers`
+
+**2. Create Voucher:**
+- Klik "Create Voucher"
+- Isi form:
+  - Voucher Code: `TEST2025`
+  - Discount: `25`
+  - Expiry Date: `2025-12-31`
+- Klik "Create"
+- Toast success muncul
+
+**3. Search & Filter:**
+- Ketik di search box
+- Pilih sort option
+- Lihat hasil filter
+
+**4. Upload CSV:**
+- Download sample CSV
+- Upload file
+- Preview data
+- Klik upload
+- Lihat hasil
+
+**5. Export CSV:**
+- Klik "Export CSV"
+- File ter-download
+
+### Unit Tests (Future)
+```bash
+# Run tests
+pnpm test
+# atau: npm test
+
+# Coverage
+pnpm test:coverage
+```
+
+---
+
+## ⚡ Performance Optimization
+
+### Implemented
+- ✅ React.memo untuk prevent re-renders
+- ✅ useMemo/useCallback untuk expensive calculations
+- ✅ Debounced search (300ms delay)
+- ✅ Lazy loading images
+- ✅ Code splitting ready
+- ✅ Production build optimization (Vite)
+
+### Build Size
 ```bash
 pnpm build
+
+# Output:
+dist/index.html                   0.x kB
+dist/assets/index-[hash].js      ~150 kB (gzipped)
+dist/assets/index-[hash].css     ~50 kB (gzipped)
 ```
 
-Output: `dist/` folder
+---
 
-Deploy to:
-- ✅ Vercel
-- ✅ Netlify  
-- ✅ GitHub Pages
-- ✅ Any static hosting
+## 🐛 Troubleshooting
 
-## 🐛 Known Limitations
+### 1. **Port sudah digunakan**
+```
+Error: Port 3000 is already in use
+```
+**Solusi:**
+- Vite akan auto-increment ke port 3001, 3002, dst
+- Atau set manual: `vite --port 3001`
 
-**Dummy Data Mode:**
-- Data only in browser localStorage
-- No backend validation
-- Single user mode
-- Not shared across devices/browsers
+### 2. **Cannot connect to API**
+```
+Network Error: Failed to fetch
+```
+**Solusi:**
+- Pastikan backend running di `http://localhost:8080`
+- Cek CORS settings di backend
+- Cek `API_BASE_URL` di `src/api/axios.ts`
 
-**For Production:** Connect to Golang backend API
+### 3. **Build Error**
+```
+Error: Cannot find module
+```
+**Solusi:**
+```bash
+# Clear cache & reinstall
+rm -rf node_modules pnpm-lock.yaml
+pnpm install
+```
 
-## 📊 Performance
+### 4. **TypeScript Errors**
+```
+Type 'X' is not assignable to type 'Y'
+```
+**Solusi:**
+- Cek type definitions di `src/types/`
+- Update TypeScript: `pnpm add -D typescript@latest`
 
-- **First Load**: < 1s
-- **CRUD Operations**: < 500ms (simulated delay)
-- **Search**: Real-time (useTransition)
-- **Bundle Size**: ~150KB (gzipped)
+### 5. **CSS tidak muncul**
+**Solusi:**
+- Pastikan Tailwind plugin aktif di `vite.config.ts`
+- Restart dev server
 
-## 🎯 Browser Support
+---
 
-- ✅ Chrome/Edge (latest)
-- ✅ Firefox (latest)
-- ✅ Safari (latest)
-- ✅ Mobile browsers (iOS Safari, Chrome Mobile)
+## 📊 Browser Support
 
-## 📄 License
+| Browser | Versi Minimal |
+|---------|---------------|
+| Chrome | 90+ |
+| Firefox | 88+ |
+| Safari | 14+ |
+| Edge | 90+ |
+| Mobile Safari | iOS 14+ |
+| Chrome Mobile | Android 90+ |
+
+---
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Login
+vercel login
+
+# Deploy
+vercel
+```
+
+**Environment Variables di Vercel:**
+```
+VITE_API_BASE_URL=https://your-api.com
+```
+
+### Netlify
+```bash
+# Install Netlify CLI
+npm install -g netlify-cli
+
+# Login
+netlify login
+
+# Deploy
+netlify deploy --prod
+```
+
+**netlify.toml:**
+```toml
+[build]
+  command = "pnpm build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+```
+
+### GitHub Pages
+```bash
+# Build
+pnpm build
+
+# Deploy ke gh-pages branch
+pnpm add -D gh-pages
+```
+
+**package.json:**
+```json
+{
+  "scripts": {
+    "deploy": "gh-pages -d dist"
+  }
+}
+```
+
+---
+
+## 📝 Environment Variables
+
+### Development (.env.development)
+```env
+VITE_API_BASE_URL=http://localhost:8080
+VITE_APP_ENV=development
+```
+
+### Production (.env.production)
+```env
+VITE_API_BASE_URL=https://api.yourdomain.com
+VITE_APP_ENV=production
+```
+
+**Akses di code:**
+```typescript
+const apiUrl = import.meta.env.VITE_API_BASE_URL;
+```
+
+---
+
+## 🛠️ Development Tools
+
+### VS Code Extensions (Recommended)
+- **ES7+ React/Redux/React-Native snippets**
+- **Tailwind CSS IntelliSense**
+- **TypeScript Vue Plugin (Volar)**
+- **ESLint**
+- **Prettier**
+
+### Chrome Extensions
+- **React Developer Tools**
+- **Redux DevTools** (jika pakai Redux)
+
+---
+
+## 📚 Resources
+
+### Documentation
+- [React Docs](https://react.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [React Router](https://reactrouter.com/)
+
+### Learning Resources
+- [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)
+- [Tailwind Components](https://tailwindui.com/)
+
+---
+
+## 📝 TODO / Future Improvements
+
+- [ ] Unit tests dengan Vitest
+- [ ] E2E tests dengan Playwright
+- [ ] Storybook untuk component library
+- [ ] PWA support (offline mode)
+- [ ] Dark mode toggle
+- [ ] Internationalization (i18n)
+- [ ] Advanced filtering (multiple criteria)
+- [ ] Bulk actions (select & delete multiple)
+- [ ] Voucher preview/print
+- [ ] Analytics dashboard
+- [ ] Real-time updates (WebSocket)
+- [ ] Redux/Zustand state management
+- [ ] Error boundary
+- [ ] Accessibility (a11y) improvements
+
+---
+
+## 🤝 Kontribusi
+
+Contributions are welcome! 
+
+1. Fork repository
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open Pull Request
+
+---
+
+## 📄 Lisensi
 
 MIT License - Free to use for learning and projects
 
+---
+
 ## 👨‍💻 Developer
 
-Built by: **@mhakimsaputra17**  
-Date: **2025-10-07**
+**Muhammad Hakim Saputra**  
+GitHub: [@mhakimsaputra17](https://github.com/mhakimsaputra17)  
+Email: Contact via GitHub
 
 ---
 
-## 🔜 Next Steps
+## 🙏 Acknowledgments
 
-- [ ] Connect to Golang backend (Gin + pgx)
-- [ ] Add real authentication (JWT)
-- [ ] Add voucher usage tracking
-- [ ] Add analytics dashboard
-- [ ] Add user roles & permissions
-- [ ] Add email notifications
-- [ ] Add QR code generation
+- **React Team** - Amazing UI library
+- **Tailwind CSS** - Beautiful utility-first CSS
+- **Vite Team** - Lightning-fast build tool
+- **TypeScript Team** - Type safety
+- **Open Source Community** - Inspiration & support
 
 ---
 
-**Happy Coding! 🚀**
+**⭐ Star this repo if you find it helpful!**
 
-Built with ❤️ using React 18, TypeScript, Vite, and Tailwind CSS 4.1
-
----
-
-## 📞 Support
-
-For questions or issues:
-- GitHub: [@mhakimsaputra17](https://github.com/mhakimsaputra17)
-- Email: Contact via GitHub
-
-**Star ⭐ this repo if you find it helpful!**
-```
+**Built with ❤️ using React 19, TypeScript, Vite, and Tailwind CSS 4**
